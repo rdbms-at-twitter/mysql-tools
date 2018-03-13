@@ -1,9 +1,10 @@
-1)@java‚ÌƒRƒ“ƒpƒCƒ‹ŠÂ‹«‚ğŠm”F
+1)ã€€javaã®ã‚³ãƒ³ãƒ‘ã‚¤ãƒ«ç’°å¢ƒã‚’ç¢ºèª
 
 [root@Labs01 demo_java]# javac HelloWorld.java 
+
 [root@Labs01 demo_java]# java HelloWorld
-ƒRƒ“ƒpƒCƒ‹ŠÂ‹«Šm”F!
+ã‚³ãƒ³ãƒ‘ã‚¤ãƒ«ç’°å¢ƒç¢ºèª!
 
-2) –â‘è–³‚¯‚ê‚ÎAMain.java‚âEmployee.java‚ğƒRƒ“ƒpƒCƒ‹
+2) å•é¡Œç„¡ã‘ã‚Œã°ã€Main.javaã‚„Employee.javaã‚’ã‚³ãƒ³ãƒ‘ã‚¤ãƒ«
 
-ŠÂ‹«İ’è‚ÍAŒŸØŠÂ‹«‚É‡‚í‚¹‚Ä‚ ‚é‚Ì‚ÅAclusterj.properties“™‚Í“K‹X•ÒWB
+ç’°å¢ƒè¨­å®šã¯ã€æ¤œè¨¼ç’°å¢ƒã«åˆã‚ã›ã¦ã‚ã‚‹ã®ã§ã€clusterj.propertiesç­‰ã¯é©å®œç·¨é›†ã€‚
