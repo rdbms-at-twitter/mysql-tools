@@ -24,7 +24,7 @@ VIEW `innodb_lock_waits` AS
         `b`.`trx_id` AS `blocking_trx_id`,
         `b`.`trx_mysql_thread_id` AS `blocking_pid`,
         IF((`b`.`trx_mysql_thread_id` = CONNECTION_ID()),
-            'Your connection is blocking',
+            'Your previous query with this connection is blocking',
             `sys`.`format_statement`(`b`.`trx_query`)) AS `blocking_query`,
         `bl`.`lock_id` AS `blocking_lock_id`,
         `bl`.`lock_mode` AS `blocking_lock_mode`,
