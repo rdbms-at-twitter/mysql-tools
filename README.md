@@ -4,6 +4,9 @@ This Repository Contain MySQL Management Scripts and Tools
 
 Example
 <BR>
+
+```sh
+
 root@localhost [sys]> select now(),sleep(10);
 +---------------------+-----------+
 | now()               | sleep(10) |
@@ -49,3 +52,5 @@ CREATED_TMP_DISK_TABLES: 0
      NO_GOOD_INDEX_USED: 0
 1 row in set (0.02 sec)
 <BR>
+
+```
