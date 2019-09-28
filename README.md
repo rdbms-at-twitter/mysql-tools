@@ -38,8 +38,8 @@ root@localhost [sys]> SELECT
               THREAD_ID: 1626
             TIMER_START: 2422470300968059000
               TIMER_END: 2422480301316512000
-           ŽÀsŠJŽn: 2019-07-20 00:50:38.300969
-           ŽÀsI—¹: 2019-07-20 00:50:48.301317
+           Start_Time: 2019-07-20 00:50:38.300969
+           End_Time: 2019-07-20 00:50:48.301317
                SQL_TEXT: select now(),sleep(10)
         TIMER_WAIT (ms): 10000.3485
           ROWS_EXAMINED: 0
