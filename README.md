@@ -19,8 +19,8 @@ root@localhost [sys]> SELECT
     -> `THREAD_ID`,
     -> `TIMER_START`,
     -> `TIMER_END`,
-    ->  DATE_ADD(SYSDATE(), INTERVAL - ((select Variable_value from sys.metrics where Variable_name = 'uptime') - TIMER_START*POW(10,-12)) SECOND) '実行開始',
-    ->  DATE_ADD(SYSDATE(), INTERVAL - ((select Variable_value from sys.metrics where Variable_name = 'uptime') - TIMER_END*POW(10,-12)) SECOND) '実行終了',
+    ->  DATE_ADD(SYSDATE(), INTERVAL - ((select Variable_value from sys.metrics where Variable_name = 'uptime') - TIMER_START*POW(10,-12)) SECOND) 'Start_Time',
+    ->  DATE_ADD(SYSDATE(), INTERVAL - ((select Variable_value from sys.metrics where Variable_name = 'uptime') - TIMER_END*POW(10,-12)) SECOND) 'End_Time',
     -> `SQL_TEXT` AS `SQL_TEXT`,
     -> (`TIMER_WAIT` / 1000000000.0) AS `TIMER_WAIT (ms)`,
     -> `ROWS_EXAMINED` AS `ROWS_EXAMINED`,
@@ -38,8 +38,8 @@ root@localhost [sys]> SELECT
               THREAD_ID: 1626
             TIMER_START: 2422470300968059000
               TIMER_END: 2422480301316512000
-           実行開始: 2019-07-20 00:50:38.300969
-           実行終了: 2019-07-20 00:50:48.301317
+           ﾅｽﾃﾂ行ﾅJﾅｽn: 2019-07-20 00:50:38.300969
+           ﾅｽﾃﾂ行ﾂ終窶板ｹ: 2019-07-20 00:50:48.301317
                SQL_TEXT: select now(),sleep(10)
         TIMER_WAIT (ms): 10000.3485
           ROWS_EXAMINED: 0
