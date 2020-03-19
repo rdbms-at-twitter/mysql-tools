@@ -1,0 +1,3 @@
+ALTER TABLE table_name 
+MODIFY created_datetime timestamp(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) COMMENT 'ミリ秒まで保持', 
+MODIFY updated_datetime timestamp(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3) COMMENT 'ミリ秒まで保持';
