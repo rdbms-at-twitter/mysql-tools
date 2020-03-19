@@ -54,3 +54,36 @@ CREATED_TMP_DISK_TABLES: 0
 <BR>
 
 ```
+
+
+### NOTE
+
+```sql
+
+SHOW GLOBAL STATUS LIKE 'Aborted%';
+
+【Aborted Clients】
+接続中のクライアントがいきなり切断した
+ネットワークの問題
+mysql_close()の呼び忘れ
+ソケットのR/Wに対するタイムアウトなど
+
+【Aborted_Connects】
+クライアントが接続しようと試みたが失敗した
+パスワードが間違ってる
+データベースへアクセスする権限がない
+不正アクセスかも？
+
+connect_timeout
+セッションを確立するまでのタイムアウト
+デフォルトは10秒
+
+wait_timeout/interactive_timeout
+セッションが新しいリクエストを発行するまでのタイムアウト
+長時間アイドル状態のセッションを切る為のもの
+デフォルトは8時間
+
+net_read_timeout/net_write_timeout
+ソケットに対するR/Wのタイムアウト
+デフォルト値はそれぞれ30秒、60秒
+```
