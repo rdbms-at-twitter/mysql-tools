@@ -56,7 +56,7 @@ CREATED_TMP_DISK_TABLES: 0
 ```
 
 
-### NOTE
+### NOTE (MySQL接続に関して)
 
 ```sql
 
