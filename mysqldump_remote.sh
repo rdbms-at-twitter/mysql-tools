@@ -1,0 +1,1 @@
+mysqldump --single-transaction --flush-logs --master-data=2 --triggers --routines --set-gtid-purged=OFF --databases DBNAME -u root -p | gzip | ssh -i /home/ec-2user/.ssh/id-User_rsa 192.168.xxx.xxx 'cat > /mnt/log/backup/archive.dump.sql.gz'
