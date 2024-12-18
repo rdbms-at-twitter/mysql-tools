@@ -55,6 +55,27 @@ CREATED_TMP_DISK_TABLES: 0
 
 ```
 
+### Errorの確認　(8.0.22 ~)
+
+```sql
+mysql> SELECT LOGGED,THREAD_ID,PRIO,ERROR_CODE,SUBSYSTEM,sys.format_statement(DATA) FROM performance_schema.error_log order by LOGGED desc limit 10;
++----------------------------+-----------+------+------------+-----------+-------------------------------------------------------------------+
+| LOGGED                     | THREAD_ID | PRIO | ERROR_CODE | SUBSYSTEM | sys.format_statement(DATA)                                        |
++----------------------------+-----------+------+------------+-----------+-------------------------------------------------------------------+
+| 2024-12-16 09:38:34.430343 |    206869 | Note | MY-010914  | Server    | Aborted connection 206869 to d ... eading communication packets). |
+| 2024-12-16 09:38:34.429723 |    206866 | Note | MY-010914  | Server    | Aborted connection 206866 to d ... eading communication packets). |
+| 2024-12-16 09:38:34.427429 |    206870 | Note | MY-010914  | Server    | Aborted connection 206870 to d ... eading communication packets). |
+| 2024-12-16 09:38:34.385606 |    206865 | Note | MY-010914  | Server    | Aborted connection 206865 to d ... eading communication packets). |
+| 2024-12-16 09:38:34.367643 |    206867 | Note | MY-010914  | Server    | Aborted connection 206867 to d ... eading communication packets). |
+| 2024-12-16 09:38:34.284570 |    206868 | Note | MY-010914  | Server    | Aborted connection 206868 to d ... eading communication packets). |
+| 2024-12-16 09:38:34.235154 |    206863 | Note | MY-010914  | Server    | Aborted connection 206863 to d ... eading communication packets). |
+| 2024-12-16 09:38:34.096448 |    206862 | Note | MY-010914  | Server    | Aborted connection 206862 to d ... eading communication packets). |
+| 2024-12-16 09:38:33.970807 |    206864 | Note | MY-010914  | Server    | Aborted connection 206864 to d ... eading communication packets). |
+| 2024-12-16 09:38:33.913408 |    206861 | Note | MY-010914  | Server    | Aborted connection 206861 to d ... eading communication packets). |
++----------------------------+-----------+------+------------+-----------+-------------------------------------------------------------------+
+10 rows in set (0.00 sec)
+```
+
 
 ### NOTE (MySQL接続に関して)
 
