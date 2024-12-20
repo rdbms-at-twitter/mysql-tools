@@ -209,6 +209,18 @@ mysql> select table_schema,table_name,total_latency,rows_fetched,rows_inserted,r
 +--------------+-------------+---------------+--------------+---------------+--------------+--------------+
 5 rows in set (0.01 sec)
 ```
+- 上記内容は以下でも確認可能 : 
+
+```
+select 
+OBJECT_SCHEMA,OBJECT_NAME,COUNT_READ,COUNT_WRITE,COUNT_FETCH,
+COUNT_INSERT,COUNT_UPDATE,COUNT_DELETE,
+FORMAT_PICO_TIME(AVG_TIMER_READ) avg_read,FORMAT_PICO_TIME(AVG_TIMER_WRITE) avg_write,
+FORMAT_PICO_TIME(AVG_TIMER_FETCH) avg_fetch,FORMAT_PICO_TIME(AVG_TIMER_INSERT) avg_insert,
+FORMAT_PICO_TIME(AVG_TIMER_UPDATE) avg_update,FORMAT_PICO_TIME(AVG_TIMER_DELETE) avg_delete
+from performance_schema.table_io_waits_summary_by_table
+where OBJECT_SCHEMA = 'airportdb' limit 10;
+```
 
 ### NOTE (MySQL接続に関して)
 
