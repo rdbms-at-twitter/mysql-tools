@@ -222,6 +222,43 @@ from performance_schema.table_io_waits_summary_by_table
 where OBJECT_SCHEMA = 'airportdb' limit 10;
 ```
 
+### Table Size and other Info
+
+```sql
+
+mysql> SELECT TABLE_SCHEMA,TABLE_NAME,TABLE_TYPE,ENGINE,ROW_FORMAT,TABLE_COLLATION,
+    -> FORMAT_BYTES(DATA_LENGTH),FORMAT_BYTES(INDEX_LENGTH),FORMAT_BYTES(DATA_FREE)
+    -> FROM information_schema.tables WHERE TABLE_SCHEMA = 'airportdb' and table_name like 'air%';
++--------------+-------------------+------------+--------+------------+--------------------+---------------------------+----------------------------+-------------------------+
+| TABLE_SCHEMA | TABLE_NAME        | TABLE_TYPE | ENGINE | ROW_FORMAT | TABLE_COLLATION    | FORMAT_BYTES(DATA_LENGTH) | FORMAT_BYTES(INDEX_LENGTH) | FORMAT_BYTES(DATA_FREE) |
++--------------+-------------------+------------+--------+------------+--------------------+---------------------------+----------------------------+-------------------------+
+| airportdb    | airline           | BASE TABLE | InnoDB | Dynamic    | utf8mb4_unicode_ci | 16.00 KiB                 |    0 bytes                 |    0 bytes              |
+| airportdb    | airplane          | BASE TABLE | InnoDB | Dynamic    | utf8mb4_unicode_ci | 224.00 KiB                |    0 bytes                 |    0 bytes              |
+| airportdb    | airplane_type     | BASE TABLE | InnoDB | Dynamic    | utf8mb4_unicode_ci | 1.52 MiB                  | 16.00 KiB                  | 2.00 MiB                |
+| airportdb    | airport           | BASE TABLE | InnoDB | Dynamic    | utf8mb4_unicode_ci | 448.00 KiB                |    0 bytes                 | 3.00 MiB                |
+| airportdb    | airport_geo       | BASE TABLE | InnoDB | Dynamic    | utf8mb4_unicode_ci | 1.52 MiB                  |    0 bytes                 | 4.00 MiB                |
+| airportdb    | airport_reachable | BASE TABLE | InnoDB | Dynamic    | utf8mb4_unicode_ci | 16.00 KiB                 |    0 bytes                 |    0 bytes              |
++--------------+-------------------+------------+--------+------------+--------------------+---------------------------+----------------------------+-------------------------+
+6 rows in set (0.01 sec)
+
+mysql> SELECT database_name,table_name,n_rows,last_update,
+    -> FORMAT_BYTES((clustered_index_size * (1024 * 16))) as clustered_index_size,
+    -> FORMAT_BYTES((sum_of_other_index_sizes * (1024 * 16))) as sum_of_other_index_sizes
+    -> FROM mysql.innodb_table_stats WHERE database_name = 'airportdb' and table_name like 'air%';
++---------------+-------------------+--------+---------------------+----------------------+--------------------------+
+| database_name | table_name        | n_rows | last_update         | clustered_index_size | sum_of_other_index_sizes |
++---------------+-------------------+--------+---------------------+----------------------+--------------------------+
+| airportdb     | airline           |    113 | 2023-12-27 07:52:37 | 16.00 KiB            |    0 bytes               |
+| airportdb     | airplane          |   5583 | 2023-12-27 07:52:37 | 224.00 KiB           |    0 bytes               |
+| airportdb     | airplane_type     |    315 | 2023-12-27 07:53:05 | 1.52 MiB             | 16.00 KiB                |
+| airportdb     | airport           |   9860 | 2023-12-27 07:52:34 | 448.00 KiB           |    0 bytes               |
+| airportdb     | airport_geo       |   9984 | 2023-12-27 07:52:22 | 1.52 MiB             |    0 bytes               |
+| airportdb     | airport_reachable |      0 | 2023-12-27 07:42:21 | 16.00 KiB            |    0 bytes               |
++---------------+-------------------+--------+---------------------+----------------------+--------------------------+
+6 rows in set (0.01 sec)
+
+```
+
 ### NOTE (MySQL接続に関して)
 
 ```sql
