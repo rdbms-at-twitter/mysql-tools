@@ -12,3 +12,5 @@ sed -i -e '/^$/d' -e 's/"//g' select_queries.sql
 
 ## If semi-colon is not required, please comment out the following line.
 sed -i 's/$/;/' select_queries.sql
+
+echo "Please check the generated file : select_queries.sql"
