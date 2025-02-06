@@ -22,7 +22,7 @@ class GeneralLogParser:
                         if query_match:
                             query = query_match.group(1).strip()
 
-                            exclude_starts = ('SET', 'SHOW', 'BEGIN', 'COMMIT',
+                            exclude_starts = ('SET', 'BEGIN', 'COMMIT',
                                            'ROLLBACK', 'USE', 'START TRANSACTION')
 
                             if not query.startswith(exclude_starts):
@@ -37,48 +37,45 @@ class GeneralLogParser:
                     print("Error processing line: {}".format(e))
                     continue
 
+    def preprocess_query(self, query):
+        # LIKEクエリの特別処理は行わない
+        return query
+
+    def is_valid_query(self, query):
+        """クエリの妥当性をチェックする補助メソッド"""
+        # 空のクエリをチェック
+        if not query.strip():
+            return False
+
+        # 基本的なSQLキーワードで始まるかチェック
+        valid_starts = ('SELECT', 'INSERT', 'UPDATE', 'DELETE', 'SHOW', 'DESCRIBE', 'EXPLAIN')
+        if not any(query.upper().startswith(keyword) for keyword in valid_starts):
+            return False
+
+        # 最小長をチェック
+        if len(query.strip()) < 7:  # "SELECT" + 空白 + 何か
+            return False
+
+        return True
+
     def generate_sysbench_script(self, output_file):
         print("Generating sysbench script...")
 
         # ヘッダー部分
         header = """#!/usr/bin/env sysbench
-require("sysbench")
 
-sysbench.cmdline.options = {
-    {
-        ["name"] = "db-driver",
-        ["type"] = "string",
-        ["default"] = "mysql"
-    },
-    {
-        ["name"] = "mysql-host",
-        ["type"] = "string",
-        ["default"] = "localhost"
-    },
-    {
-        ["name"] = "mysql-user",
-        ["type"] = "string",
-        ["default"] = "root"
-    },
-    {
-        ["name"] = "mysql-password",
-        ["type"] = "string",
-        ["default"] = ""
-    },
-    {
-        ["name"] = "mysql-db",
-        ["type"] = "string",
-        ["default"] = "test"
-    }
-}
+require("oltp_common")
+
+function prepare_statements()
+   -- Prepare statements if needed
+end
 
 function thread_init()
     drv = sysbench.sql.driver()
     con = drv:connect()
 end
 
-function event()
-"""
+function event()"""
 
         # フッター部分
         footer = """
@@ -86,14 +83,19 @@ end
 
 function thread_done()
     con:disconnect()
-end
-"""
+end"""
 
         # クエリブロックの生成
         query_blocks = []
         for query in self.queries:
-            escaped_query = query.replace("'", "\\'").replace('"', '\\"')
-            query_blocks.append("    con:query([[{}]])".format(escaped_query))
+            # 空のクエリや不完全なクエリをスキップ
+            if not query.strip() or query.strip().lower() == 'select':
+                continue
+
+            # クエリのバリデーション
+            if self.is_valid_query(query):
+                # クエリをそのままダブルブラケットで囲む
+                query_blocks.append("    con:query([[{}]])".format(query))
 
         # 最終的なスクリプトの組み立て
         final_script = header + "\n" + "\n".join(query_blocks) + footer
@@ -118,4 +120,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
