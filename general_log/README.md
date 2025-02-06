@@ -23,10 +23,10 @@ select USER();
 ```
 
 
-
+- Running mysqlslap
 
 ```
-[root@ip-172-31-102-178 general_log]# /usr/local/mysql/bin/mysqlslap \
+$ /usr/local/mysql/bin/mysqlslap \
 >   --concurrency=10 \
 >   --iterations=1 \
 >   --query=select_queries.sql \
@@ -42,8 +42,6 @@ Benchmark
         Maximum number of seconds to run all queries: 0.174 seconds
         Number of clients running queries: 10
         Average number of queries per client: 11
-
-[root@ip-172-31-102-178 general_log]#
 ```
 
 
