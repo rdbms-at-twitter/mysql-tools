@@ -1,5 +1,7 @@
 ## Generate sql file for mysqlslap
 
+#### note : *multi_line.shはGeneralログに複数行にクエリーが分かれている場合に利用
+
 - Generate a query file. (output: select_queries.sql )
 
 ```
