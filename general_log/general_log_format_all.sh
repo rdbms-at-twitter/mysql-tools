@@ -9,6 +9,8 @@ fi
 # Extract all queries in order and clean up formatting
 grep -i "Query\s\+" $1 | \
 sed -n 's/.*Query\s\+\(SELECT\|INSERT\|UPDATE\|DELETE\).*$/\0/ip' | \
+# In case of select Query Only for multi-threads testing.
+# sed -n 's/.*Query\s\+\(SELECT\).*$/\0/ip' | \
 sed -n 's/.*Query\s\+\(.*\)/\1/p' | \
 sed 's/[[:space:]]\+/ /g' | \
 # Put semi-colon if not.
