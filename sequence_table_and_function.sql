@@ -1,4 +1,4 @@
-- シーケンステーブルの作成
+-- シーケンステーブルの作成
 CREATE TABLE sequence_table (
     name VARCHAR(50) NOT NULL PRIMARY KEY,
     current_value BIGINT NOT NULL,
@@ -6,11 +6,11 @@ CREATE TABLE sequence_table (
     comment VARCHAR(100)
 ) ENGINE=InnoDB;
 
-- 初期データの投入
+-- 初期データの投入
 INSERT INTO sequence_table (name, current_value, increment, comment) 
 VALUES ('SEQUENCE_NO', 0, 1, '管理番号用シーケンス');
 
-- シーケンス取得用の関数
+-- シーケンス取得用の関数
 DELIMITER //
 
 CREATE FUNCTION get_sequence_id(sequence_name VARCHAR(50)) 
@@ -36,5 +36,5 @@ END //
 
 DELIMITER ;
 
-- 使用例 :
+-- 使用例 :
 SELECT get_sequence_id('SEQUENCE_NO');
