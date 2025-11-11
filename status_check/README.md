@@ -4,7 +4,7 @@
 
 
 ```
-[ec2-user@ip-172-31-8-156 scripts]$ sh check_mysql_mem_temp_status.sh -u admin -p$pass -h aurora-v3.cluster-cpdziwfew7pa.us-east-1.rds.amazonaws.com
+[ec2-user@ip-172-31-8-156 scripts]$ sh check_mysql_mem_temp_status.sh -u <User> -p$pass -h <MySQL Hostname>
 === MySQL TempStorageEngine 利用状況分析 ===
 実行時刻: Tue Nov 11 01:42:10 UTC 2025
 
