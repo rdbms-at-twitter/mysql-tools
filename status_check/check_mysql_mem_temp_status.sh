@@ -13,10 +13,20 @@ echo
 echo "--- 現在の設定 ---"
 $MYSQL_CMD -e "
 SELECT
-    @@temptable_max_ram/1024/1024/1024 AS 'temptable_max_ram_GB',
-    @@temptable_max_mmap/1024/1024/1024 AS 'temptable_max_mmap_GB',
-    @@tmp_table_size/1024/1024 AS 'tmp_table_size_MB',
-    @@internal_tmp_mem_storage_engine AS 'tmp_storage_engine'
+    'temptable_max_ram' AS setting_name,
+    format_bytes(@@temptable_max_ram) AS setting_value
+UNION ALL
+SELECT
+    'temptable_max_mmap',
+    format_bytes(@@temptable_max_mmap)
+UNION ALL
+SELECT
+    'tmp_table_size',
+    format_bytes(@@tmp_table_size)
+UNION ALL
+SELECT
+    'internal_tmp_mem_storage_engine',
+    @@internal_tmp_mem_storage_engine;
 " 2>/dev/null
 
 if [ $? -ne 0 ]; then
@@ -25,9 +35,9 @@ if [ $? -ne 0 ]; then
 fi
 
 echo
-echo "--- TempTable メモリ使用状況 ---"
+echo "--- TempTable メモリ使用状況（RAM/MMAP/Disk） ---"
 
-# メモリ使用状況を取得してアドバイス
+# メモリ使用状況を統合表示（RAM、MMAP、Diskを含む）
 $MYSQL_CMD -e "
 SELECT
     EVENT_NAME,
@@ -45,24 +55,28 @@ ORDER BY EVENT_NAME;
 " 2>/dev/null
 
 echo
+echo "--- Option : 一時テーブル ディスク使用量モニタリング (sys schema) ---"
+
+# sys.memory_global_by_current_bytes を使用したディスク使用量モニタリング
+$MYSQL_CMD -e "
+SELECT
+    event_name,
+    current_count,
+    current_alloc,
+    current_avg_alloc,
+    high_count,
+    high_alloc,
+    high_avg_alloc
+FROM sys.memory_global_by_current_bytes
+WHERE event_name LIKE 'memory/temptable/%'
+ORDER BY current_alloc DESC;
+" 2>/dev/null
+
+echo
 echo "--- 分析とアドバイス ---"
 
 # 設定値とメトリクスを取得してアドバイス生成
 $MYSQL_CMD -N -e "
-SELECT
-    CONCAT('RAM上限: ', FORMAT(@@temptable_max_ram/1024/1024/1024, 2), ' GB') AS config_info
-UNION ALL
-SELECT
-    CONCAT('MMAP上限: ', FORMAT(@@temptable_max_mmap/1024/1024/1024, 2), ' GB')
-UNION ALL
-SELECT
-    CONCAT('tmp_table_size: ', FORMAT(@@tmp_table_size/1024/1024, 0), ' MB')
-UNION ALL
-SELECT
-    CONCAT('ストレージエンジン: ', @@internal_tmp_mem_storage_engine)
-UNION ALL
-SELECT '---'
-UNION ALL
 SELECT
     CASE
         WHEN ram.HIGH_NUMBER_OF_BYTES_USED > @@temptable_max_ram * 0.8 THEN
@@ -102,11 +116,11 @@ UNION ALL
 SELECT
     CASE
         WHEN @@tmp_table_size < 64*1024*1024 THEN
-            CONCAT('💡 tmp_table_size (', FORMAT(@@tmp_table_size/1024/1024, 0), 'MB) が小さい - 64MB以上を推奨 ※Aurora: aurora_tmptable_enable_per_table_limit=ON時のみ有効')
+            CONCAT('💡 tmp_table_size (', format_bytes(@@tmp_table_size), ') が小さい - 64MB以上を推奨 ※Aurora: aurora_tmptable_enable_per_table_limit=ON時のみ有効')
         WHEN @@tmp_table_size > 1024*1024*1024 THEN
-            CONCAT('⚠️  tmp_table_size (', FORMAT(@@tmp_table_size/1024/1024, 0), 'MB) が大きすぎる可能性 ※Aurora: aurora_tmptable_enable_per_table_limit=ON時のみ有効')
+            CONCAT('⚠️  tmp_table_size (', format_bytes(@@tmp_table_size), ') が大きすぎる可能性 ※Aurora: aurora_tmptable_enable_per_table_limit=ON時のみ有効')
         ELSE
-            CONCAT('✅ tmp_table_size: ', FORMAT(@@tmp_table_size/1024/1024, 0), 'MB - 適切 ※Aurora: aurora_tmptable_enable_per_table_limit=ON時のみ有効')
+            CONCAT('✅ tmp_table_size: ', format_bytes(@@tmp_table_size), ' - 適切 ※Aurora: aurora_tmptable_enable_per_table_limit=ON時のみ有効')
     END
 UNION ALL
 SELECT
@@ -117,11 +131,3 @@ SELECT
             '✅ TempTableエンジン使用中'
     END;
 " 2>/dev/null
-
-echo
-echo "--- 推奨アクション ---"
-echo "• 高RAM使用率: SET GLOBAL temptable_max_ram = <新しい値>;"
-echo "• 高MMAP使用率: SET GLOBAL temptable_max_mmap = <新しい値>;"
-echo "• 小さいtmp_table_size: SET GLOBAL tmp_table_size = 67108864; (64MB) ※Aurora: aurora_tmptable_enable_per_table_limit=ON時のみ有効"
-echo "• ディスク使用: クエリのJOIN/GROUP BY/ORDER BYを最適化"
-echo "• 継続監視: このスクリプトを定期実行してトレンドを把握"
