@@ -120,3 +120,5 @@ Threads fairness:
     execution time (avg/stddev):   10.0542/0.02
 
 ```
+
+* ここではサンプルとして、MySQL Communityで提供しているsakilaデータベースを利用しています。
