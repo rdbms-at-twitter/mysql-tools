@@ -1,0 +1,44 @@
+  CREATE OR REPLACE
+  DEFINER = CURRENT_USER
+  SQL SECURITY INVOKER
+  VIEW innodb_lock_waits_ext AS
+  SELECT
+      r.trx_wait_started                                   AS wait_started,
+      TIMESTAMPDIFF(SECOND, r.trx_wait_started, NOW())     AS wait_age_secs,
+      CONCAT(rl.OBJECT_SCHEMA, '.', rl.OBJECT_NAME)        AS locked_table,
+      rl.INDEX_NAME                                        AS locked_index,
+      rl.LOCK_TYPE                                         AS locked_type,
+      /* 待たされている側 */
+      r.trx_id                                             AS waiting_trx_id,
+      r.trx_mysql_thread_id                                AS waiting_pid,
+      r.trx_query                                          AS waiting_query,
+      rl.LOCK_MODE                                         AS waiting_lock_mode,
+      /* ブロックしている側 */
+      b.trx_id                                             AS blocking_trx_id,
+      b.trx_mysql_thread_id                                AS blocking_pid,
+      b.trx_query                                          AS blocking_trx_query,      -- 従来の列（実行中Txの現行クエリ, NULLになり得る）
+      bt.THREAD_ID                                         AS blocking_thread_id,      -- ★ 変換後のTHREAD_ID
+      esc.SQL_TEXT                                         AS blocking_current_sql,    -- ★ ブロッカーが今実行中のフルSQL
+      esc.EVENT_NAME                                       AS blocking_current_event,
+      bl.LOCK_MODE                                         AS blocking_lock_mode,
+      b.trx_started                                        AS blocking_trx_started,
+      TIMESTAMPDIFF(SECOND, b.trx_started, NOW())          AS blocking_trx_age_secs,
+      b.trx_rows_locked                                    AS blocking_trx_rows_locked,
+      b.trx_rows_modified                                  AS blocking_trx_rows_modified,
+      CONCAT('KILL QUERY ', b.trx_mysql_thread_id)         AS sql_kill_blocking_query,
+      CONCAT('KILL ', b.trx_mysql_thread_id)               AS sql_kill_blocking_connection
+  FROM performance_schema.data_lock_waits w
+  JOIN information_schema.INNODB_TRX b
+       ON b.trx_id = CAST(w.BLOCKING_ENGINE_TRANSACTION_ID AS CHAR CHARSET utf8mb4)
+  JOIN information_schema.INNODB_TRX r
+       ON r.trx_id = CAST(w.REQUESTING_ENGINE_TRANSACTION_ID AS CHAR CHARSET utf8mb4)
+  JOIN performance_schema.data_locks bl
+       ON bl.ENGINE_LOCK_ID = w.BLOCKING_ENGINE_LOCK_ID  AND bl.ENGINE = w.ENGINE
+  JOIN performance_schema.data_locks rl
+       ON rl.ENGINE_LOCK_ID = w.REQUESTING_ENGINE_LOCK_ID AND rl.ENGINE = w.ENGINE
+  /* ★ blocking_pid(PROCESSLIST_ID) → THREAD_ID に変換して現在SQLを取得 */
+  LEFT JOIN performance_schema.threads bt
+       ON bt.PROCESSLIST_ID = b.trx_mysql_thread_id
+  LEFT JOIN performance_schema.events_statements_current esc
+       ON esc.THREAD_ID = bt.THREAD_ID
+  ORDER BY r.trx_wait_started;
