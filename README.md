@@ -259,6 +259,47 @@ mysql> SELECT database_name,table_name,n_rows,last_update,
 
 ```
 
+### Enhanced innodb_lock_waits (Lockしている側のクエリーを表示)
+
+- blockしている側のクエリは実行中のクエリが確認できる (≒ thread_idは変わらないが古いクエリが見える事があります)
+
+```
+mysql> select * from innodb_lock_waits_ext\G
+*************************** 1. row ***************************
+                wait_started: 2026-08-28 01:36:16
+               wait_age_secs: 21
+                locked_table: poc.shop
+                locked_index: PRIMARY
+                 locked_type: RECORD
+              waiting_trx_id: 1705780
+                 waiting_pid: 2399
+               waiting_query: select * from shop for update
+           waiting_lock_mode: X
+             blocking_trx_id: 1705761
+                blocking_pid: 2402
+          blocking_trx_query: NULL
+          blocking_thread_id: 331
+        blocking_current_sql: update shop set price = 10.01 where article =1 and dealer = 'A'
+      blocking_current_event: statement/sql/update
+          blocking_lock_mode: X,REC_NOT_GAP
+        blocking_trx_started: 2026-08-28 01:35:58
+       blocking_trx_age_secs: 39
+    blocking_trx_rows_locked: 1
+  blocking_trx_rows_modified: 1
+     sql_kill_blocking_query: KILL QUERY 2402
+sql_kill_blocking_connection: KILL 2402
+1 row in set (0.01 sec)
+
+mysql> select * from innodb_lock_waits_ext\G
+Empty set (0.00 sec)
+
+mysql>
+
+```
+
+
+
+
 ### NOTE (MySQL接続に関して)
 
 ```sql
